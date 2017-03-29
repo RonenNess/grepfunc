@@ -1,12 +1,12 @@
 # GrepFunc
-Lightweight lib to iterate and process files using multiple sources and filters.
+Simple grep-like function for Python.
 
 Source at [GitHub](https://github.com/RonenNess/grepfunc).
 Docs at [PythonHosted.org](http://pythonhosted.org/grepfunc/).
 
 ## Install
 
-Install grepfunc via pip:
+Install GrepFunc via pip:
 
 ```python
 pip install grepfunc
@@ -14,16 +14,17 @@ pip install grepfunc
 
 ## How to use
 
-GrepFunc provide a single function, grep, which works pretty much like the Unix's grep command but implemented as a Python function and operates on variables.
+```GrepFunc``` provide a single function, ```grep```, which imitates Unix's ```grep``` functionality, but operate on lists and variables instead of files.
 
-```grep``` can accept a single string, an iterable, or an opened file. Its default return value is a list of matching strings from input.
+The function accept a single string, an iterable, or an opened file handler to search. The default return value is a list of matching strings from input.
 
 ### Flags
 
-When using ```grep``` you can set different flags (implemented as named arguments).
-GrepFunc tries to imitate the Unix ```grep``` command flags, but obviously since we are not dealing with files here many flags were omitted.
+```GrepFunc``` comes with a set of flags you can set to change ```grep```'s behavior (implemented as named arguments).
 
-GrepFunc support the following flags:
+The flags try to imitate the Unix ```grep``` flags as much as possible, but obviously since we are dealing with variables and not files, some flags were omitted / changed.
+
+The following flags are currently supported:
 
 ```
     unix grep standard flags:
@@ -53,51 +54,55 @@ GrepFunc support the following flags:
 
 ### Usage examples
 
-The following is a set of examples to show how to use GrepFunc:
+The following is a set of examples to show how to use ```GrepFunc```.
 
 #### Simple grep
 
-The following example Will return a list of movie names with the word 'dog' in them.
+The following example will return a list of movie names with the word 'dog' in them.
 
 ```python
 from grepfunc import grep
 
-# grep titles with the word 'dog' in them. Note: set i=True to ignore case.
 movies = ['Ghost Dog', 'Die Hard', 'Matrix', 'The Ring', 'Cats and Dogs', 'Batman', 'Superman', 'Reservoir Dogs']
-print "Movies with 'Dog' in the title", grep(movies, "dog", i=True)
+
+# grep titles with the word 'dog' in them. Note: i=True will ignore case.
+grep(movies, "dog", i=True)
 
 # output:
-# >>> Movies with 'Dog' in the title ['Ghost Dog', 'Cats and Dogs', 'Reservoir Dogs']
+# >>> ['Ghost Dog', 'Cats and Dogs', 'Reservoir Dogs']
 ```
 
 #### Invert grep
 
-The following example Will return a list of movie names without the word 'dog' in them.
+The following example will return a list of movie names without the word 'dog' in them.
 
 ```python
 from grepfunc import grep
 
-# grep titles with the word 'dog' in them. Note: set i=True to ignore case.
 movies = ['Ghost Dog', 'Die Hard', 'Matrix', 'The Ring', 'Cats and Dogs', 'Batman', 'Superman', 'Reservoir Dogs']
-print "Movies without 'Dog' in the title", grep(movies, "dog", i=True, v=True)
+
+# grep titles *without* the word 'dog' in them. Note: i=True will ignore case.
+grep(movies, "dog", i=True, v=True)
 
 # output:
-# >>> Movies without 'Dog' in the title ['Die Hard', 'Matrix', 'The Ring', 'Batman', 'Superman']
+# >>> ['Die Hard', 'Matrix', 'The Ring', 'Batman', 'Superman']
 ```
 
 #### Grep on file
 
-The following example Will return a list of movie names without the word 'dog' in them, read from a file.
+The following example will return a list of movie names without the word 'dog' in them, read from a file.
 
 ```python
 from grepfunc import grep
 
-# grep titles with the word 'dog' in them. Note: set i=True to ignore case.
+# the file contains the following list of words: ['Ghost Dog', 'Die Hard', 'Matrix', 'The Ring', 'Cats and Dogs', 'Batman', 'Superman', 'Reservoir Dogs']
 infile = open('movies.txt', 'r')
-print "Movies without 'Dog' in the title", grep(infile, "dog", i=True, v=True)
+
+# grep titles *without* the word 'dog' in them from file. Note: i=True will ignore case.
+grep(infile, "dog", i=True)
 
 # output:
-# >>> Movies with 'Dog' in the title ['Ghost Dog', 'Cats and Dogs', 'Reservoir Dogs']
+# >>> ['Ghost Dog', 'Cats and Dogs', 'Reservoir Dogs']
 ```
 
 #### Quiet grep
@@ -107,24 +112,25 @@ The following example Will return True if the list contains a movie title with t
 ```python
 from grepfunc import grep
 
-# grep titles with the word 'dog' in them. Note: set i=True to ignore case.
 movies = ['Ghost Dog', 'Die Hard', 'Matrix', 'The Ring', 'Cats and Dogs', 'Batman', 'Superman', 'Reservoir Dogs']
-print "Got a movie with 'Dog' in title?", grep(movies, "dog", i=True, q=True)
+
+# grep if the word 'dog' appears in any of the movie titles. Note: set i=True to ignore case.
+grep(movies, "dog", i=True, q=True)
 
 # output:
-# >>> Got a movie with 'Dog' in title? True
+# >>> True
 ```
 
 ## Run Tests
 
-From GrepFunc root dir:
+From ```GrepFunc``` root dir:
 
 ```shell
 cd tests
 python test_all.py
 ```
 
-Tests are not included in the pypi package, to run them please clone from git.
+Note that the tests are not included in the pypi package, so to run them please clone the git repository from [GitHub](https://github.com/RonenNess/grepfunc).
 
 ## Changes
 
