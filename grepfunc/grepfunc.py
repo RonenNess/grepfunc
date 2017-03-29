@@ -81,9 +81,6 @@ def grep(target, pattern, **kwargs):
     ret = []
     for line_index, line in enumerate(target):
 
-        # do grap
-        match, index = __do_grep(line, pattern, **kwargs)
-
         # trim end of line
         if need_to_trim_eol and line.endswith('\n'):
             line = line[:-1]
@@ -91,6 +88,9 @@ def grep(target, pattern, **kwargs):
         # check if need to trim all values
         if f_trim:
             line = line.trim()
+
+        # do grap
+        match, index = __do_grep(line, pattern, **kwargs)
 
         # if matched
         if match:
@@ -139,7 +139,7 @@ def __do_grep(curr_line, pattern, **kwargs):
     position = -1
 
     # check if fixed strings mode
-    if kwargs.get('f') or kwargs.get('fixed_strings'):
+    if kwargs.get('fixed_strings'):
 
         # if case insensitive fix case
         if kwargs.get('ignore_case'):

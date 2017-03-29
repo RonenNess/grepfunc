@@ -134,6 +134,8 @@ Note that the tests are not included in the pypi package, so to run them please 
 
 ## Changes
 
+.
+
 ## Contact
 
 For bugs please use [GitHub issues](https://github.com/RonenNess/grepfunc/issues).
