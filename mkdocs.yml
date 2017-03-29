@@ -1,0 +1,5 @@
+site_name: GrepFunc.py
+docs_dir: .
+pages:
+- Home: readme.md
+theme: readthedocs
