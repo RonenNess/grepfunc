@@ -8,7 +8,6 @@ import unittest
 
 """
 words:
-
     chubby
     hub
     Hub
@@ -16,11 +15,8 @@ words:
     hottub
     blue hub
     green HuB.
-"""
 
-"""
 flags:
-
     - F, fixed_strings:     Interpret 'pattern' as a list of fixed strings, separated by newlines, any of which is
                             to be matched. If not set, will interpret 'pattern' as a python regular expression.
     - i, ignore_case:       Ignore case.
@@ -41,14 +37,18 @@ flags:
     - t, trim               If true, will trim all whitespace characters from every line processed.
 """
 
+# test file path
+test_file_path = "test.txt"
+
+
+def _open_test_file():
+    return open(test_file_path, 'r')
+
 
 class TestGrep(unittest.TestCase):
     """
     Unittests to test grep.
     """
-    # test file path
-    test_file_path = "test.txt"
-
     # test words (read from file)
     with open(test_file_path, 'r') as infile:
         test_words = [x.strip() for x in infile.readlines()]
@@ -57,8 +57,9 @@ class TestGrep(unittest.TestCase):
     def test_file(self):
         """
         get opened test file.
+        note: return a function and not a file instance so it will reopen it every call.
         """
-        return open(self.test_file_path, 'r')
+        return _open_test_file
 
     @property
     def test_list(self):
@@ -71,7 +72,7 @@ class TestGrep(unittest.TestCase):
         """
         get list of titles and sources.
         """
-        return [("file", self.test_file), (self.test_list, "list")]
+        return [("file", self.test_file), ("list", self.test_list)]
 
     def test_basic(self):
         """
@@ -79,7 +80,7 @@ class TestGrep(unittest.TestCase):
         """
         for title, source in self.get_sources():
             self.assertListEqual(['chubby', 'hub', 'blue hub'], grep(source, "hub"), "Failed regular grep on " + title)
-            self.assertListEqual(['chubby', 'hub', 'Hub', 'blue hub', 'green HuB.'], grep(source, "hub", F=True), "Failed regular grep with strings on " + title)
+            self.assertListEqual(['chubby', 'hub', 'blue hub'], grep(source, "hub", F=True), "Failed regular grep with strings on " + title)
 
     def test_case_insensitive(self):
         """

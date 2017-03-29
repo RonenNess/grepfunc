@@ -18,7 +18,7 @@ except NameError:
 def grep(target, pattern, **kwargs):
     """
     Main grep function
-    :param target: Target to apply grep on. Can be a single string, an iterable, or an opened file handler.
+    :param target: Target to apply grep on. Can be a single string, an iterable, a function, or an opened file handler.
     :param pattern: Grep pattern to search.
     :param kwargs: Optional flags (note: the docs below talk about matching 'lines', but this function also accept lists
                     and other iterables - in those cases, a 'line' means a single value from the iterable).
@@ -69,6 +69,10 @@ def grep(target, pattern, **kwargs):
     f_offset = kwargs.get('offset')
     f_line_number = kwargs.get('line_number')
     f_trim = kwargs.get('trim')
+
+    # if target is a callable function, call it first to get value
+    if callable(target):
+        target = target()
 
     # if we got a single string convert it to a list
     if isinstance(target, _basestring):
