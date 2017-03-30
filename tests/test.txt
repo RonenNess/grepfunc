@@ -3,5 +3,5 @@ hub
 Hub
 dog
 hottub  
-blue hub
 green HuB.
+blue hub

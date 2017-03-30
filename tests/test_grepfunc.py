@@ -3,39 +3,8 @@
 """
 Tests for the file filters.
 """
-from grepfunc import grep
+from grepfunc import grep, grep_iter
 import unittest
-
-"""
-words:
-    chubby
-    hub
-    Hub
-    dog
-    hottub
-    blue hub
-    green HuB.
-
-flags:
-    - F, fixed_strings:     Interpret 'pattern' as a list of fixed strings, separated by newlines, any of which is
-                            to be matched. If not set, will interpret 'pattern' as a python regular expression.
-    - i, ignore_case:       Ignore case.
-    - v, invert:            Invert (eg return non-matching lines / values).
-    - w, words:             Select only those lines containing matches that form whole words.
-    - x, line:              Select only matches that exactly match the whole line.
-    - c, count:             Instead of the normal output, print a count of matching lines.
-    TBD- m NUM, max_count:     Stop reading after NUM matching values.
-    TBD- q, quiet:             Instead of returning string / list of strings return just a single True / False if
-                            found matches.
-    TBD- o, offset:            Instead of a list of strings will return a list of (offset, string), where offset is
-                            the offset of the matched 'pattern' in line.
-    TBD- n, line_number:       Instead of a list of strings will return a list of (index, string), where index is the
-                            line number.
-    TBD- r, regex_flags:       Any additional regex flags you want to add when using regex (see python re flags).
-    TBD- k, keep_eol           When iterating file, if this option is set will keep the end-of-line at the end of every
-                            line. If not (default) will trim the end of line character.
-    TBD- t, trim               If true, will trim all whitespace characters from every line processed.
-"""
 
 # test file path
 test_file_path = "test.txt"
@@ -76,19 +45,44 @@ class TestGrep(unittest.TestCase):
 
     def test_basic(self):
         """
-        Testing basic grep with no special flags.
+        Testing basic grep with regex and fixed strings.
         """
         for title, source in self.get_sources():
             self.assertListEqual(['chubby', 'hub', 'blue hub'], grep(source, "hub"))
             self.assertListEqual(['chubby', 'hub', 'blue hub'], grep(source, "hub", F=True))
+            self.assertListEqual(['chubby', 'hub', 'blue hub'], grep(source, ["hub"], F=True))
+            self.assertListEqual(['chubby', 'hub', 'dog', 'blue hub'], grep(source, ["hub", "dog"], F=True))
+
+    def test_regex(self):
+        """
+        Testing a simple regex expression.
+        """
+        for title, source in self.get_sources():
+            self.assertListEqual(['chubby', 'hub', 'blue hub'], grep(source, "h.b"))
+
+    def test_grep_iter(self):
+        """
+        Testing grep_iter with no special flags.
+        """
+        for title, source in self.get_sources():
+
+            ret = []
+            for i in grep_iter(source, "hub"):
+                ret.append(i)
+            self.assertListEqual(['chubby', 'hub', 'blue hub'], ret)
+
+            ret = []
+            for i in grep_iter(source, "hub", F=True):
+                ret.append(i)
+            self.assertListEqual(['chubby', 'hub', 'blue hub'], ret)
 
     def test_case_insensitive(self):
         """
         Testing case insensitive flags.
         """
         for title, source in self.get_sources():
-            self.assertListEqual(['chubby', 'hub', 'Hub', 'blue hub', 'green HuB.'], grep(source, "hub", i=True))
-            self.assertListEqual(['chubby', 'hub', 'Hub', 'blue hub', 'green HuB.'], grep(source, "hub", i=True, F=True))
+            self.assertListEqual(['chubby', 'hub', 'Hub', 'green HuB.', 'blue hub'], grep(source, "hub", i=True))
+            self.assertListEqual(['chubby', 'hub', 'Hub', 'green HuB.', 'blue hub'], grep(source, "hub", i=True, F=True))
 
     def test_invert(self):
         """
@@ -126,4 +120,95 @@ class TestGrep(unittest.TestCase):
         """
         for title, source in self.get_sources():
             self.assertEqual(3, grep(source, "hub", c=True))
-            self.assertEqual(3, grep(source, "hub", c=True))
+            self.assertEqual(4, grep(source, "h", c=True))
+            self.assertEqual(6, grep(source, "h", c=True, i=True))
+
+    def test_max_count(self):
+        """
+        Testing max count flag.
+        """
+        for title, source in self.get_sources():
+            self.assertEqual(2, grep(source, "h", c=True, m=2))
+            self.assertEqual(2, grep(source, "h", c=True, m=2, i=True))
+
+    def test_quiet(self):
+        """
+        Testing quiet flag.
+        """
+        for title, source in self.get_sources():
+            self.assertEqual(True, grep(source, "hub", c=True, q=True))
+            self.assertEqual(True, grep(source, "hub", c=True, q=True, i=True))
+            self.assertEqual(True, grep(source, "dog", c=True, q=True, i=True))
+            self.assertEqual(False, grep(source, "wrong", c=True, q=True, i=True))
+
+    def test_offset(self):
+        """
+        Testing offset flag.
+        """
+        for title, source in self.get_sources():
+            self.assertListEqual([(1, 'chubby'), (0, 'hub'), (5, 'blue hub')], grep(source, "hub", b=True))
+
+    def test_only_match(self):
+        """
+        Testing only_match flag.
+        """
+        for title, source in self.get_sources():
+            self.assertListEqual(['hub', 'hub', 'Hub', 'HuB', 'hub'], grep(source, "hub", o=True, i=True))
+
+    def test_line_number(self):
+        """
+        Testing line number flag.
+        """
+        for title, source in self.get_sources():
+            self.assertListEqual([(0, 'chubby'), (1, 'hub'), (6, 'blue hub')], grep(source, "hub", n=True))
+
+    def test_keep_eol(self):
+        """
+        Testing keep eol flag.
+        """
+        self.assertListEqual(['chubby\n', 'hub\n', 'blue hub\n'], grep(self.test_file, "hub", k=True))
+        self.assertListEqual(['chubby', 'hub', 'blue hub'], grep(self.test_list, "hub", k=True))
+
+    def test_trim(self):
+        """
+        Testing trim flag.
+        """
+        for title, source in self.get_sources():
+            self.assertListEqual(['hottub'], grep(source, "hottub", t=True))
+
+    def test_re_flags(self):
+        """
+        Testing re-flags flags.
+        """
+        import re
+        for title, source in self.get_sources():
+
+            # test re flag ignore case. note: in second call the flag is ignored because we use pattern as strings.
+            self.assertListEqual(['chubby', 'hub', 'Hub', 'green HuB.', 'blue hub'], grep(source, "hub", r=re.IGNORECASE))
+            self.assertListEqual(['chubby', 'hub', 'blue hub'], grep(source, "hub", r=re.IGNORECASE, F=True))
+
+    def test_after_context(self):
+        """
+        Testing after context flag.
+        """
+        # test after-context alone
+        for title, source in self.get_sources():
+            self.assertListEqual([['dog', 'hottub', 'green HuB.']], grep(source, "dog", A=2, t=True))
+            self.assertListEqual([['blue hub']], grep(source, "blue hub", A=2, t=True))
+
+        # combined with before-context
+        for title, source in self.get_sources():
+            self.assertListEqual([['Hub', 'dog', 'hottub', 'green HuB.']], grep(source, "dog", A=2, B=1, t=True))
+
+    def test_before_context(self):
+        """
+        Testing before context flag.
+        """
+        # test before-context alone
+        for title, source in self.get_sources():
+            self.assertListEqual([['hub', 'Hub', 'dog']], grep(source, "dog", B=2, t=True))
+            self.assertListEqual([['chubby']], grep(source, "chubby", B=2, t=True))
+
+        # combined with after-context
+        for title, source in self.get_sources():
+            self.assertListEqual([['hub', 'Hub', 'dog', 'hottub  ']], grep(source, "dog", B=2, A=1))
