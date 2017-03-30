@@ -141,6 +141,7 @@ def __do_grep(curr_line, pattern, **kwargs):
     """
     # currently found position
     position = -1
+    end_pos = -1
 
     # check if fixed strings mode
     if kwargs.get('fixed_strings'):
@@ -159,13 +160,16 @@ def __do_grep(curr_line, pattern, **kwargs):
 
             # found? break
             if position != -1:
+                end_pos = position + len(p)
                 break
 
         # check if need to match whole words
         if kwargs.get('words') and position != -1:
 
-            # first validate starting position
-            if position != 0 and curr_line[position].isalpha() and curr_line[position] != '_':
+            foundpart = (' ' + curr_line + ' ')[position:position+len(pattern)+2]
+            if foundpart[0].isalpha() or foundpart[0] == '_':
+                position = -1
+            elif foundpart[-1].isalpha() or foundpart[-1] == '_':
                 position = -1
 
     # if not fixed string, it means its a regex
@@ -185,9 +189,10 @@ def __do_grep(curr_line, pattern, **kwargs):
         # if found, set position
         if result:
             position = result.start()
+            end_pos = result.end()
 
     # check if need to match whole line
-    if kwargs.get('line') and position != len(curr_line):
+    if kwargs.get('line') and (position != 0 or end_pos != len(curr_line)):
         position = -1
 
     # parse return value

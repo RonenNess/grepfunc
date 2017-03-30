@@ -2,6 +2,6 @@ chubby
 hub
 Hub
 dog
-hottub
+hottub  
 blue hub
 green HuB.
