@@ -7,5 +7,7 @@ __version__ = '1.0.1'
 __author__ = 'Ronen Ness'
 __license__ = 'MIT'
 
-from grepfunc import grep, grep_iter
+from . import grepfunc as _grepfunc
+grep = _grepfunc.grep
+grep_iter = _grepfunc.grep_iter
 
