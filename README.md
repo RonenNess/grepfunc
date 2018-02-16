@@ -156,7 +156,18 @@ Note that the tests are not included in the pypi package, so to run them please 
 
 ## Changes
 
-.
+### 1.0.2
+
+- Fixed imports for Python 3.
+
+## Update Package
+
+After updating config files and version:
+
+```
+py -2 setup.py sdist
+twine upload dist/grepfunc-<new-version>.zip
+```
 
 ## Contact
 
