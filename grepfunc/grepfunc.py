@@ -231,9 +231,6 @@ def grep_iter(target, pattern, **kwargs):
         if value is not None:
             yield value
 
-    # done iteration
-    raise StopIteration
-
 
 def __process_line(line, strip_eol, strip):
     """
