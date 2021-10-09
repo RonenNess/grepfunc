@@ -156,6 +156,10 @@ Note that the tests are not included in the pypi package, so to run them please 
 
 ## Changes
 
+### 1.0.3
+
+- Removed 'raise StopIteration' to support Python > 3.5.
+
 ### 1.0.2
 
 - Fixed imports for Python 3.

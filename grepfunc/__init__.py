@@ -3,7 +3,7 @@
 __all__ = ['grep', 'grep_iter', ]
 
 __title__ = 'grepfunc'
-__version__ = '1.0.1'
+__version__ = '1.0.3'
 __author__ = 'Ronen Ness'
 __license__ = 'MIT'
 
